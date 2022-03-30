@@ -6,7 +6,7 @@
 /*   By: grubin <grubin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/17 16:02:12 by grubin            #+#    #+#             */
-/*   Updated: 2022/03/28 10:59:58 by grubin           ###   ########.fr       */
+/*   Updated: 2022/03/29 16:24:27 by grubin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ int ft_init_mutex(t_params *params)
     int err;
     
     i = 0;    
-    params->mutex_philo = malloc(params->nb_philo * sizeof(pthread_t));
+    params->mutex_philo = malloc(params->nb_philo * sizeof(pthread_mutex_t));
     if (!params->mutex_philo)
         return (0);
     while (i < params->nb_philo)
@@ -46,8 +46,19 @@ int ft_init_forks(t_philo *tab_philo, t_philo *philo)
     return(1);
 }
 
-int ft_init_threads(t_philo *philo, t_params *params, t_philo *tab_philo)
+int ft_init_time(t_philo *tab_philo)
 {
+    struct timeval time;
+    
+    gettimeofday(&time, NULL);
+    tab_philo->init_time = (time.tv_sec * 1000) + (time.tv_usec / 1000);
+    tab_philo->last_meal = (time.tv_sec * 1000) + (time.tv_usec / 1000);
+    return (1);
+}
+
+t_philo *ft_init_threads(t_philo *philo, t_params *params)
+{
+    t_philo *tab_philo;
     int err;
 
     philo->index_philo = 0;
@@ -56,10 +67,11 @@ int ft_init_threads(t_philo *philo, t_params *params, t_philo *tab_philo)
         return (0);
     if (ft_init_mutex(params) == 0)
         return (0);
-        // stocker gettiemofday dans une variable
     while (philo->index_philo < philo->params->nb_philo)
     {
-        tab_philo[philo->index_philo].index_philo = philo->index_philo;
+        ft_init_time(&tab_philo[philo->index_philo]);
+        tab_philo[philo->index_philo].index_philo = philo->index_philo + 1;
+        tab_philo[philo->index_philo].nb_of_eat = philo->nb_of_eat;
         tab_philo[philo->index_philo].params = params;
         ft_init_forks(tab_philo, philo);
         err = pthread_create(&philo->thread_philo, NULL, &ft_routine, &tab_philo[philo->index_philo]);
@@ -68,6 +80,5 @@ int ft_init_threads(t_philo *philo, t_params *params, t_philo *tab_philo)
         tab_philo[philo->index_philo].thread_philo = philo->thread_philo;
         philo->index_philo++;
     }
-    free(tab_philo);
-    return (1);
+    return (tab_philo);
 }

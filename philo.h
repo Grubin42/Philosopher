@@ -6,7 +6,7 @@
 /*   By: grubin <grubin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/15 16:05:46 by grubin            #+#    #+#             */
-/*   Updated: 2022/03/28 11:54:34 by grubin           ###   ########.fr       */
+/*   Updated: 2022/03/30 11:06:11 by grubin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <sys/time.h>
 #include <time.h>
+#include <errno.h>
 
 typedef struct s_params
 {
@@ -32,8 +33,9 @@ typedef struct s_params
 
 typedef struct s_philo
 {
+    long            last_meal;
     int             nb_of_eat;
-    int             init_time;
+    long            init_time;
     int             index_philo;
     pthread_mutex_t *fork_left;
     pthread_mutex_t *fork_right;
@@ -43,8 +45,10 @@ typedef struct s_philo
 
 int                 ft_atoi(const char *str);
 int                 ft_init_struct(char **argv, t_philo *philo);
-int                 ft_init_threads(t_philo *philo, t_params *params, t_philo *tab_philo);
+t_philo             *ft_init_threads(t_philo *philo, t_params *params);
 void                ft_free(t_philo *philo);
 void                *ft_routine();
+long                current_time(void);
+void                sleep_ms(int ms);
 
 #endif

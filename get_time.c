@@ -1,18 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   free.c                                             :+:      :+:    :+:   */
+/*   get_time.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: grubin <grubin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/03/16 14:02:41 by grubin            #+#    #+#             */
-/*   Updated: 2022/03/23 14:25:36 by grubin           ###   ########.fr       */
+/*   Created: 2022/03/30 10:52:04 by grubin            #+#    #+#             */
+/*   Updated: 2022/03/30 11:06:00 by grubin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void    ft_free(t_philo *philo)
+long current_time(void)
 {
-    free(philo->params->mutex_philo);
+    struct timeval time;
+    
+    gettimeofday(&time, NULL);
+    return (time.tv_sec *1000 + time.tv_usec / 1000);
+}
+
+void    sleep_ms(int ms)
+{
+    long    start;
+    long    curr;
+    
+    start = current_time();
+    curr = start;
+    while (curr < start + ms)
+    {
+        curr = current_time();
+        usleep(200);
+    }
 }
