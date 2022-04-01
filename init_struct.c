@@ -6,7 +6,7 @@
 /*   By: grubin <grubin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/16 13:02:25 by grubin            #+#    #+#             */
-/*   Updated: 2022/03/30 12:50:57 by grubin           ###   ########.fr       */
+/*   Updated: 2022/03/31 16:26:30 by grubin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,10 @@ int	ft_check_argv(char **argv, t_philo *philo)
 			if (argv[i][j] >= 48 && argv[i][j] <= 57)
 				j++;
 			else
+			{
+				write(1, "error not a number\n", 19);
 				return (1);
+			}
 		}
 		i--;
 	}
@@ -40,6 +43,11 @@ int	ft_init_struct(char **argv, t_philo *philo)
 	else
 	{
 		philo->params->nb_philo = ft_atoi(argv[1]);
+		if (philo->params->nb_philo == 0)
+		{
+			write(1, "error no philo\n", 15);
+			return (1);
+		}
 		philo->params->time_to_die = ft_atoi(argv[2]);
 		philo->params->time_to_eat = ft_atoi(argv[3]);
 		philo->params->time_to_sleep = ft_atoi(argv[4]);

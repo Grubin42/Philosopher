@@ -6,14 +6,38 @@
 /*   By: grubin <grubin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/17 16:02:17 by grubin            #+#    #+#             */
-/*   Updated: 2022/03/30 13:00:20 by grubin           ###   ########.fr       */
+/*   Updated: 2022/04/01 09:37:08 by grubin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	ft_routine_bis(t_philo *philo)
+long	current_time(void)
 {
+	struct timeval	time;
+
+	gettimeofday(&time, NULL);
+	return (time.tv_sec * 1000 + time.tv_usec / 1000);
+}
+
+void	sleep_ms(int ms)
+{
+	long	start;
+	long	curr;
+
+	start = current_time();
+	curr = start;
+	while (curr < start + ms)
+	{
+		curr = current_time();
+		usleep(200);
+	}
+}
+
+int	ft_routine_bis(t_philo *philo)
+{
+	if (current_time() - philo->last_meal >= philo->params->time_to_die)
+		return (0);
 	pthread_mutex_lock(philo->fork_left);
 	printf("%6ld %d  has taken a fork left\n", current_time()
 		- philo->init_time, philo->index_philo);
@@ -26,12 +50,17 @@ void	ft_routine_bis(t_philo *philo)
 	sleep_ms(philo->params->time_to_eat);
 	pthread_mutex_unlock(philo->fork_left);
 	pthread_mutex_unlock(philo->fork_right);
+	pthread_mutex_lock(philo->params->mutex_sleeping);
 	printf("%6ld %d  is sleeping\n", current_time()
 		- philo->init_time, philo->index_philo);
+	pthread_mutex_unlock(philo->params->mutex_sleeping);
 	sleep_ms(philo->params->time_to_sleep);
+	pthread_mutex_lock(philo->params->mutex_thinging);
 	printf("%6ld %d  is thinking\n", current_time()
 		- philo->init_time, philo->index_philo);
+	pthread_mutex_unlock(philo->params->mutex_thinging);
 	philo->nb_of_eat--;
+	return (1);
 }
 
 void	*ft_routine(void *arg)
@@ -40,12 +69,15 @@ void	*ft_routine(void *arg)
 
 	philo = (t_philo *)arg;
 	if (philo->index_philo % 2 == 0)
-		usleep (1000);
+		usleep(1000);
 	while (1)
 	{
 		if (philo->nb_of_eat == 0)
 			break ;
-		ft_routine_bis(philo);
+		if (current_time() - philo->last_meal >= philo->params->time_to_die)
+			break ;
+		if (ft_routine_bis(philo) == 0)
+			break ;
 	}
 	return (0);
 }

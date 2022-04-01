@@ -6,7 +6,7 @@
 /*   By: grubin <grubin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/15 16:05:46 by grubin            #+#    #+#             */
-/*   Updated: 2022/03/30 12:56:31 by grubin           ###   ########.fr       */
+/*   Updated: 2022/03/31 18:18:16 by grubin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@
 # include <unistd.h>
 # include <sys/time.h>
 # include <time.h>
-# include <errno.h>
 
 typedef struct s_params
 {
@@ -29,6 +28,8 @@ typedef struct s_params
 	int				time_to_eat;
 	int				time_to_sleep;
 	pthread_mutex_t	*mutex_philo;
+	pthread_mutex_t	*mutex_sleeping;
+	pthread_mutex_t	*mutex_thinging;
 }					t_params;
 
 typedef struct s_philo
@@ -39,16 +40,16 @@ typedef struct s_philo
 	int				index_philo;
 	pthread_mutex_t	*fork_left;
 	pthread_mutex_t	*fork_right;
-	pthread_t		thread_philo;
+	pthread_t		*thread_philo;
 	t_params		*params;
 }					t_philo;
 
 int					ft_atoi(const char *str);
 int					ft_init_struct(char **argv, t_philo *philo);
 t_philo				*ft_init_threads(t_philo *philo, t_params *params);
-void				ft_free(t_philo *philo);
 void				*ft_routine(void *arg);
 long				current_time(void);
 void				sleep_ms(int ms);
+int					ft_phtread_join(t_philo *tab_philo);
 
 #endif

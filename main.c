@@ -6,11 +6,17 @@
 /*   By: grubin <grubin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/15 16:05:04 by grubin            #+#    #+#             */
-/*   Updated: 2022/03/30 13:03:45 by grubin           ###   ########.fr       */
+/*   Updated: 2022/04/01 09:47:40 by grubin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+void ft_free(t_params *params)
+{
+	free(params->mutex_philo);
+	free(params->mutex_sleeping);
+	free(params->mutex_thinging);
+}
 
 int	ft_check_routine(t_philo *tab_philo, t_params *params, t_philo *philo)
 {
@@ -19,20 +25,40 @@ int	ft_check_routine(t_philo *tab_philo, t_params *params, t_philo *philo)
 	while (1)
 	{
 		i = 0;
+		usleep(100);
 		while (i < philo->params->nb_philo)
 		{
 			if (tab_philo[i].nb_of_eat == 0)
-				return (0);
+			{
+				usleep(100);
+				return (1);
+			}
 			if (current_time() - tab_philo[i].last_meal >= params->time_to_die)
 			{
+				usleep(100);
 				printf("%6ld %d died\n", current_time()
 					- tab_philo[i].init_time, i + 1);
-				return (0);
+				return (1);
 			}
 			i++;
 		}
 	}
+	return (0);
 }
+
+/*int ft_phtread_join(t_philo *tab_philo)
+{
+	int i;
+	void *ret;
+
+	i = 0;
+	while (i < tab_philo->params->nb_philo - 1)
+	{
+		pthread_join(tab_philo[i].thread_philo[i], &ret);
+		i++;
+	}
+	return (0);
+}*/
 
 int	main(int argc, char **argv)
 {
@@ -50,7 +76,11 @@ int	main(int argc, char **argv)
 		tab_philo = ft_init_threads(&philo, &params);
 		if (tab_philo == NULL)
 			return (0);
-		ft_check_routine(tab_philo, &params, &philo);
+		if (ft_check_routine(tab_philo, &params, &philo) == 1)
+			ft_free(&params);
+
 	}
+	else
+		write(1, "error argument", 14);
 	return (0);
 }

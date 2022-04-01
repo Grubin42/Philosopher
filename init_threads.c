@@ -6,7 +6,7 @@
 /*   By: grubin <grubin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/17 16:02:12 by grubin            #+#    #+#             */
-/*   Updated: 2022/03/30 13:01:33 by grubin           ###   ########.fr       */
+/*   Updated: 2022/04/01 09:13:11 by grubin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,20 @@ int	ft_init_mutex(t_params *params)
 
 	i = 0;
 	params->mutex_philo = malloc(params->nb_philo * sizeof(pthread_mutex_t));
-	if (!params->mutex_philo)
+	params->mutex_sleeping = malloc(params->nb_philo * sizeof(pthread_mutex_t));
+	params->mutex_thinging = malloc(params->nb_philo * sizeof(pthread_mutex_t));
+	if (!params->mutex_philo || !params->mutex_sleeping
+		|| !params->mutex_thinging)
 		return (0);
 	while (i < params->nb_philo)
 	{
 		err = pthread_mutex_init(&params->mutex_philo[i], NULL);
+		if (err != 0)
+			return (0);
+		err = pthread_mutex_init(&params->mutex_sleeping[i], NULL);
+		if (err != 0)
+			return (0);
+		err = pthread_mutex_init(&params->mutex_thinging[i], NULL);
 		if (err != 0)
 			return (0);
 		i++;
@@ -31,7 +40,7 @@ int	ft_init_mutex(t_params *params)
 	return (1);
 }
 
-int	ft_init_forks(t_philo *tab_philo, t_philo *philo)
+void	ft_init_forks(t_philo *tab_philo, t_philo *philo)
 {
 	if (philo->index_philo == philo->params->nb_philo - 1)
 	{
@@ -47,17 +56,20 @@ int	ft_init_forks(t_philo *tab_philo, t_philo *philo)
 		tab_philo[philo->index_philo].fork_right
 			= &philo->params->mutex_philo[philo->index_philo + 1];
 	}
-	return (1);
 }
 
-int	ft_init_time(t_philo *tab_philo)
+void ft_init_mutex_print(t_philo *tab_philo, t_philo *philo)
 {
-	struct timeval	time;
+	tab_philo[philo->index_philo].params->mutex_sleeping
+		= philo->params->mutex_sleeping;
+	tab_philo[philo->index_philo].params->mutex_thinging
+		= philo->params->mutex_thinging;
+}
 
-	gettimeofday(&time, NULL);
-	tab_philo->init_time = (time.tv_sec * 1000) + (time.tv_usec / 1000);
-	tab_philo->last_meal = (time.tv_sec * 1000) + (time.tv_usec / 1000);
-	return (1);
+void	ft_init_time(t_philo *tab_philo)
+{
+	tab_philo->init_time = current_time();
+	tab_philo->last_meal = current_time();
 }
 
 t_philo	*ft_init_threads(t_philo *philo, t_params *params)
@@ -67,21 +79,23 @@ t_philo	*ft_init_threads(t_philo *philo, t_params *params)
 
 	philo->index_philo = 0;
 	tab_philo = malloc(philo->params->nb_philo * sizeof(t_philo));
+	philo->thread_philo = malloc(params->nb_philo * sizeof(pthread_t));
 	if (!tab_philo)
-		return (0);
+		return (NULL);
 	if (ft_init_mutex(params) == 0)
-		return (0);
+		return (NULL);
 	while (philo->index_philo < philo->params->nb_philo)
 	{
 		ft_init_time(&tab_philo[philo->index_philo]);
 		tab_philo[philo->index_philo].index_philo = philo->index_philo + 1;
-		tab_philo[philo->index_philo].nb_of_eat = philo->nb_of_eat;
 		tab_philo[philo->index_philo].params = params;
+		tab_philo[philo->index_philo].nb_of_eat = philo->nb_of_eat;
 		ft_init_forks(tab_philo, philo);
-		err = pthread_create(&philo->thread_philo, NULL, &ft_routine,
+		ft_init_mutex_print(tab_philo, philo);
+		err = pthread_create(&philo->thread_philo[philo->index_philo], NULL, &ft_routine,
 				&tab_philo[philo->index_philo]);
 		if (err != 0)
-			return (0);
+			return (NULL);
 		tab_philo[philo->index_philo].thread_philo = philo->thread_philo;
 		philo->index_philo++;
 	}
