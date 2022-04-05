@@ -6,7 +6,7 @@
 /*   By: grubin <grubin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/17 16:02:17 by grubin            #+#    #+#             */
-/*   Updated: 2022/04/01 09:37:08 by grubin           ###   ########.fr       */
+/*   Updated: 2022/04/01 14:27:02 by grubin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,10 +34,8 @@ void	sleep_ms(int ms)
 	}
 }
 
-int	ft_routine_bis(t_philo *philo)
+void	ft_routine_bis(t_philo *philo)
 {
-	if (current_time() - philo->last_meal >= philo->params->time_to_die)
-		return (0);
 	pthread_mutex_lock(philo->fork_left);
 	printf("%6ld %d  has taken a fork left\n", current_time()
 		- philo->init_time, philo->index_philo);
@@ -60,7 +58,6 @@ int	ft_routine_bis(t_philo *philo)
 		- philo->init_time, philo->index_philo);
 	pthread_mutex_unlock(philo->params->mutex_thinging);
 	philo->nb_of_eat--;
-	return (1);
 }
 
 void	*ft_routine(void *arg)
@@ -76,8 +73,7 @@ void	*ft_routine(void *arg)
 			break ;
 		if (current_time() - philo->last_meal >= philo->params->time_to_die)
 			break ;
-		if (ft_routine_bis(philo) == 0)
-			break ;
+		ft_routine_bis(philo);
 	}
 	return (0);
 }

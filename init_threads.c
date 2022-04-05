@@ -6,7 +6,7 @@
 /*   By: grubin <grubin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/17 16:02:12 by grubin            #+#    #+#             */
-/*   Updated: 2022/04/01 09:13:11 by grubin           ###   ########.fr       */
+/*   Updated: 2022/04/01 11:05:44 by grubin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,7 @@ void	ft_init_forks(t_philo *tab_philo, t_philo *philo)
 	}
 }
 
-void ft_init_mutex_print(t_philo *tab_philo, t_philo *philo)
+void	ft_init_mutex_print(t_philo *tab_philo, t_philo *philo)
 {
 	tab_philo[philo->index_philo].params->mutex_sleeping
 		= philo->params->mutex_sleeping;
@@ -80,9 +80,7 @@ t_philo	*ft_init_threads(t_philo *philo, t_params *params)
 	philo->index_philo = 0;
 	tab_philo = malloc(philo->params->nb_philo * sizeof(t_philo));
 	philo->thread_philo = malloc(params->nb_philo * sizeof(pthread_t));
-	if (!tab_philo)
-		return (NULL);
-	if (ft_init_mutex(params) == 0)
+	if (!tab_philo || ft_init_mutex(params) == 0)
 		return (NULL);
 	while (philo->index_philo < philo->params->nb_philo)
 	{
@@ -92,8 +90,8 @@ t_philo	*ft_init_threads(t_philo *philo, t_params *params)
 		tab_philo[philo->index_philo].nb_of_eat = philo->nb_of_eat;
 		ft_init_forks(tab_philo, philo);
 		ft_init_mutex_print(tab_philo, philo);
-		err = pthread_create(&philo->thread_philo[philo->index_philo], NULL, &ft_routine,
-				&tab_philo[philo->index_philo]);
+		err = pthread_create(&philo->thread_philo[philo->index_philo], NULL,
+				&ft_routine, &tab_philo[philo->index_philo]);
 		if (err != 0)
 			return (NULL);
 		tab_philo[philo->index_philo].thread_philo = philo->thread_philo;

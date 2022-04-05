@@ -6,12 +6,13 @@
 /*   By: grubin <grubin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/15 16:05:04 by grubin            #+#    #+#             */
-/*   Updated: 2022/04/01 09:47:40 by grubin           ###   ########.fr       */
+/*   Updated: 2022/04/05 10:14:32 by grubin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
-void ft_free(t_params *params)
+
+void	ft_free(t_params *params)
 {
 	free(params->mutex_philo);
 	free(params->mutex_sleeping);
@@ -78,7 +79,6 @@ int	main(int argc, char **argv)
 			return (0);
 		if (ft_check_routine(tab_philo, &params, &philo) == 1)
 			ft_free(&params);
-
 	}
 	else
 		write(1, "error argument", 14);
